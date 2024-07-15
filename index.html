@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Air Quality Health Index</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .container { text-align: center; margin-top: 50px; }
+    .aqi { font-size: 48px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Current Air Quality Health Index</h1>
+    <div id="aqhi" class="aqhi">Loading...</div>
+  </div>
+  <script>
+    async function fetchAQHI() {
+      const url = "http://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
+      
+      try {
+        const response = await fetch(url);
+        
+        if (response.ok) {
+          const data = await response.json();
+          const edmontonEastAQHI = data.value.find(station => station.StationName === "Edmonton East");
+          
+          if (edmontonEastAQHI) {
+            document.getElementById('aqhi').innerText = edmontonEastAQHI.Aqhi;
+          } else {
+            document.getElementById('aqhi').innerText = 'Data not available';
+          }
+        } else {
+          document.getElementById('aqhi').innerText = 'Failed to retrieve data';
+        }
+      } catch (error) {
+        document.getElementById('aqhi').innerText = 'Error fetching data';
+      }
+    }
+
+    fetchAQHI();
+  </script>
+</body>
+</html>
