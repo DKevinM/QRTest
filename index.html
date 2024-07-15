@@ -9,14 +9,7 @@
     .aqi { font-size: 48px; }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Current Air Quality Health Index</h1>
-    <div id="aqi" class="aqi">Loading AQHI...</div>
-    <div id="healthRisk">Loading Health Risk...</div>
-    <div id="generalMessage">Loading General Population Message...</div>
-    <div id="atRiskMessage">Loading At Risk Message...</div>
-  </div>
+
   <script>
     async function fetchAQHI() {
       const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
@@ -29,10 +22,10 @@
           const edmontonEastData = data.value.find(station => station.StationName === "Edmonton East");
           
           if (edmontonEastData) {
-            document.getElementById('Aqhi').innerText = `AQHI: ${edmontonEastData.Aqhi}`;
-            document.getElementById('HealthRisk').innerText = `Health Risk: ${edmontonEastData.HealthRisk}`;
-            document.getElementById('GeneralPopulationMessage').innerText = `General Population Message: ${edmontonEastData.GeneralPopulationMessage}`;
-            document.getElementById('AtRiskMessage').innerText = `At Risk Message: ${edmontonEastData.AtRiskMessage}`;
+            document.getElementById('Aqhi').innerText = `AQHI: ${Aqhi}`;
+            document.getElementById('HealthRisk').innerText = `Health Risk: ${HealthRisk}`;
+            document.getElementById('GeneralPopulationMessage').innerText = `General Population Message: ${GeneralPopulationMessage}`;
+            document.getElementById('AtRiskMessage').innerText = `At Risk Message: ${AtRiskMessage}`;
           } else {
             document.getElementById('Aqhi').innerText = 'Data not available';
             document.getElementById('HealthRisk').innerText = '';
