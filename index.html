@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Air Quality Health Index</title>
+  <title>Air Quality Index</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; }
@@ -9,7 +9,13 @@
     .aqi { font-size: 48px; }
   </style>
 </head>
-
+<body>
+  <div class="container">
+    <h1>Current Air Quality Index</h1>
+    <div id="aqhi" class="aqhi">Loading AQHI...</div>
+    <div id="generalMessage">Loading General Population Message...</div>
+    <div id="atRiskMessage">Loading At Risk Message...</div>
+  </div>
   <script>
     async function fetchAQHI() {
       const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
@@ -17,27 +23,28 @@
       try {
         const response = await fetch(url);
         
-        if (response.ok) {
-          const data = await response.json();
-          const edmontonEastData = data.value.find(station => station.StationName === "Edmonton East");
-          
-          if (edmontonEastData) {
-            document.getElementById('Aqhi').innerText = `AQHI: ${Aqhi}`;
-            document.getElementById('HealthRisk').innerText = `Health Risk: ${HealthRisk}`;
-            document.getElementById('GeneralPopulationMessage').innerText = `General Population Message: ${GeneralPopulationMessage}`;
-            document.getElementById('AtRiskMessage').innerText = `At Risk Message: ${AtRiskMessage}`;
-          } else {
-            document.getElementById('Aqhi').innerText = 'Data not available';
-            document.getElementById('HealthRisk').innerText = '';
-            document.getElementById('GeneralPopulationMessage').innerText = '';
-            document.getElementById('AtRiskMessage').innerText = '';
-          }
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const data = await response.json();
+        console.log('Data:', data);
+        const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
+        
+        if (edmontonMcCauleyData) {
+          document.getElementById('ahqi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
+          document.getElementById('generalMessage').innerText = `General Population Message: ${edmontonMcCauleyData.GeneralPopulationMessage}`;
+          document.getElementById('atRiskMessage').innerText = `At Risk Message: ${edmontonMcCauleyData.AtRiskMessage}`;
+        } else {
+          document.getElementById('aqhi').innerText = 'Data not available';
+          document.getElementById('generalMessage').innerText = '';
+          document.getElementById('atRiskMessage').innerText = '';
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
-        document.getElementById('Aqhi').innerText = 'Error fetching data';
-        document.getElementById('HealthRisk').innerText = '';
-        document.getElementById('GeneralPopulationMessage').innerText = '';
-        document.getElementById('AtRiskMessage').innerText = '';
+        document.getElementById('aqhi').innerText = 'Error fetching data';
+        document.getElementById('generalMessage').innerText = '';
+        document.getElementById('atRiskMessage').innerText = '';
       }
     }
 
