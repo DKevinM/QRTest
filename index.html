@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Air Quality Health Index</title>
+  <title>Air Quality Index</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; }
@@ -12,29 +12,39 @@
 <body>
   <div class="container">
     <h1>Current Air Quality Health Index</h1>
-    <div id="aqhi" class="aqhi">Loading...</div>
+    <div id="aqi" class="aqi">Loading AQHI...</div>
+    <div id="healthRisk">Loading Health Risk...</div>
+    <div id="generalMessage">Loading General Population Message...</div>
+    <div id="atRiskMessage">Loading At Risk Message...</div>
   </div>
   <script>
     async function fetchAQHI() {
-      const url = "http://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
+      const url = "https://cors-anywhere.herokuapp.com/https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
       
       try {
         const response = await fetch(url);
         
         if (response.ok) {
           const data = await response.json();
-          const edmontonEastAQHI = data.value.find(station => station.StationName === "Edmonton East");
+          const edmontonEastData = data.value.find(station => station.StationName === "Edmonton East");
           
-          if (edmontonEastAQHI) {
-            document.getElementById('Aqhi').innerText = edmontonEastAQHI.Aqhi;
+          if (edmontonEastData) {
+            document.getElementById('Aqhi').innerText = `AQHI: ${edmontonEastData.Aqhi}`;
+            document.getElementById('HealthRisk').innerText = `Health Risk: ${edmontonEastData.HealthRisk}`;
+            document.getElementById('GeneralPopulationMessage').innerText = `General Population Message: ${edmontonEastData.GeneralPopulationMessage}`;
+            document.getElementById('AtRiskMessage').innerText = `At Risk Message: ${edmontonEastData.AtRiskMessage}`;
           } else {
-            document.getElementById('aqhi').innerText = 'Data not available';
+            document.getElementById('Aqhi').innerText = 'Data not available';
+            document.getElementById('HealthRisk').innerText = '';
+            document.getElementById('GeneralPopulationMessage').innerText = '';
+            document.getElementById('AtRiskMessage').innerText = '';
           }
-        } else {
-          document.getElementById('aqhi').innerText = 'Failed to retrieve data';
-        }
       } catch (error) {
-        document.getElementById('aqhi').innerText = 'Error fetching data';
+        console.error('Error fetching data:', error);
+        document.getElementById('Aqhi').innerText = 'Error fetching data';
+        document.getElementById('HealthRisk').innerText = '';
+        document.getElementById('GeneralPopulationMessage').innerText = '';
+        document.getElementById('AtRiskMessage').innerText = '';
       }
     }
 
