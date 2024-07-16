@@ -6,14 +6,15 @@
   <style>
     body { font-family: Arial, sans-serif; }
     .container { text-align: center; margin-top: 50px; }
-    .aqi { font-size: 48px; }
+    .aqhi { font-size: 48px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Current AQHI at Edmonton McCauley</h1>
     <div id="aqhi" class="aqhi">Loading AQHI...</div>
-    <div id="time" class="time">Loading Reading Time...</div>
+    <div id="healthRisk">Loading Health Risk...</div>
+    <div id="readingDate">Loading Reading Date...</div>
     <div id="generalMessage">Loading General Population Message...</div>
     <div id="atRiskMessage">Loading At Risk Message...</div>
   </div>
@@ -41,20 +42,23 @@
           console.log('Filtered data for Edmonton McCauley:', edmontonMcCauleyData);
           
           if (edmontonMcCauleyData) {
-            document.getElementById('aqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;           
-            document.getElementById('ReadingDate').innerText = `Reading Date: ${edmontonMcCauleyData.ReadingDate}`;
+            document.getElementById('aqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
+            document.getElementById('healthRisk').innerText = `Health Risk: ${edmontonMcCauleyData.HealthRisk}`;
+            document.getElementById('readingDate').innerText = `Reading Date: ${edmontonMcCauleyData.ReadingDate}`;
             document.getElementById('generalMessage').innerText = `General Population Message: ${edmontonMcCauleyData.GeneralPopulationMessage}`;
             document.getElementById('atRiskMessage').innerText = `At Risk Message: ${edmontonMcCauleyData.AtRiskMessage}`;
           } else {
             document.getElementById('aqhi').innerText = 'Data not available';
-            document.getElementById('ReadingDate').innerText = '';
+            document.getElementById('healthRisk').innerText = '';
+            document.getElementById('readingDate').innerText = '';
             document.getElementById('generalMessage').innerText = '';
             document.getElementById('atRiskMessage').innerText = '';
           }
         } catch (error) {
           console.error('Error fetching data:', error);
           document.getElementById('aqhi').innerText = 'Error fetching data';
-          document.getElementById('ReadingDate').innerText = '';
+          document.getElementById('healthRisk').innerText = '';
+          document.getElementById('readingDate').innerText = '';
           document.getElementById('generalMessage').innerText = '';
           document.getElementById('atRiskMessage').innerText = '';
         }
