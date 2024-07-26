@@ -113,19 +113,19 @@
           console.log('PurpleAir data fetched:', results);
 
           results.forEach((sensorData, index) => {
-            const { data_time_stamp, humidity, pm2_5_atm } = sensorData.sensor;
+            const { data_time_stamp, humidity, pm2.5_atm } = sensorData.sensor;
             
             // Adjust the time stamp
             const adjustedTimestamp = new Date((data_time_stamp * 1000) - (60 * 60 * 6 * 1000));
             
             // Adjust PM2.5 values based on relative humidity
-            let adjustedPM25 = pm2_5_atm;
+            let adjustedPM25 = pm2.5_atm;
             if (humidity < 30) {
-              adjustedPM25 = pm2_5_atm / (1 + 0.24 / (100 / 30 - 1));
+              adjustedPM25 = pm2.5_atm / (1 + 0.24 / (100 / 30 - 1));
             } else if (humidity > 70) {
-              adjustedPM25 = pm2_5_atm / (1 + 0.24 / (100 / 70 - 1));
+              adjustedPM25 = pm2.5_atm / (1 + 0.24 / (100 / 70 - 1));
             } else {
-              adjustedPM25 = pm2_5_atm / (1 + 0.24 / (100 / humidity - 1));
+              adjustedPM25 = pm2.5_atm / (1 + 0.24 / (100 / humidity - 1));
             }
 
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
