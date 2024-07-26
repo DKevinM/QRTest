@@ -11,16 +11,11 @@
 </head>
 <body>
   <div class="container">
+    <h1>Current AQHI for Edmonton Community</h1>
+    <div id="communityAqhi" class="communityAqhi">Loading Community AQHI...</div>
+    
     <h1>Current AQHI at Edmonton McCauley</h1>
     <div id="mccauleyAqhi" class="aqhi">Loading AQHI...</div>
-    <div id="mccauleyHealthRisk">Loading Health Risk...</div>
-    <div id="mccauleyReadingDate">Loading Reading Date...</div>
-
-    <h1>Current AQHI for Edmonton Community</h1>
-    <div id="communityAqhi" class="communityAqhi">Loading AQHI...</div>
-    <div id="communityForecastToday">Loading Forecast Today...</div>
-    <div id="communityForecastTomorrow">Loading Forecast Tomorrow...</div>
-    <div id="communityForecastTonight">Loading Forecast Tonight...</div>
 
     <h1>Current Data from PurpleAir Sensors</h1>
     <div id="purpleAirData1" class="purpleair">Loading PurpleAir Data for Sensor 1...</div>
@@ -30,59 +25,18 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-      async function fetchAQHI() {
-        const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
-        
-        try {
-          const response = await fetch(url);
-          
-          if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-          }
-
-          const data = await response.json();
-          
-          if (!data.value) {
-            throw new Error('Data value is undefined');
-          }
-
-          const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
-          
-          if (edmontonMcCauleyData) {
-            document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
-            document.getElementById('mccauleyHealthRisk').innerText = `Health Risk: ${edmontonMcCauleyData.HealthRisk}`;
-            document.getElementById('mccauleyReadingDate').innerText = `Reading Date: ${new Date(edmontonMcCauleyData.ReadingDate).toLocaleString()}`;
-          } else {
-            document.getElementById('mccauleyAqhi').innerText = 'Data not available';
-            document.getElementById('mccauleyHealthRisk').innerText = '';
-            document.getElementById('mccauleyReadingDate').innerText = '';
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          document.getElementById('mccauleyAqhi').innerText = 'Error fetching data';
-          document.getElementById('mccauleyHealthRisk').innerText = '';
-          document.getElementById('mccauleyReadingDate').innerText = '';
-        }
-      }
-
-      async function fetchCommunityAQHI() {
+        async function fetchCommunityAQHI() {
         const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
-        
         try {
           const response = await fetch(url);
-          
           if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
           }
-
           const data = await response.json();
-          
           if (!data.value) {
             throw new Error('Data value is undefined');
           }
-
-          const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");
-          
+          const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");         
           if (edmontonCommunityData) {
             document.getElementById('communityAqhi').innerText = `AQHI: ${edmontonCommunityData.Aqhi}`;
             document.getElementById('communityForecastToday').innerText = `Forecast Today: ${edmontonCommunityData.ForecastToday}`;
@@ -103,6 +57,7 @@
         }
       }
 
+
       async function fetchPurpleAirData() {
         const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
         const sensorIds = ['178323', '27659', '223765'];
@@ -117,8 +72,25 @@
               return response.json();
             });
           });
+          if (edmontonMcCauleyData) {
+            document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
+            document.getElementById('mccauleyHealthRisk').innerText = `Health Risk: ${edmontonMcCauleyData.HealthRisk}`;
+            document.getElementById('mccauleyReadingDate').innerText = `Reading Date: ${new Date(edmontonMcCauleyData.ReadingDate).toLocaleString()}`;
+          } else {
+            document.getElementById('mccauleyAqhi').innerText = 'Data not available';
+            document.getElementById('mccauleyHealthRisk').innerText = '';
+            document.getElementById('mccauleyReadingDate').innerText = '';
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          document.getElementById('mccauleyAqhi').innerText = 'Error fetching data';
+          document.getElementById('mccauleyHealthRisk').innerText = '';
+          document.getElementById('mccauleyReadingDate').innerText = '';
+        }
+      }
 
-          const results = await Promise.all(promises);
+
+         const results = await Promise.all(promises);
           results.forEach((sensorData, index) => {
             const { data_time_stamp, humidity, pm2_5_atm } = sensorData.sensor;
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
