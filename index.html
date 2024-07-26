@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,7 +23,9 @@
     <div id="communityForecastTonight">Loading Forecast Tonight...</div>
 
     <h1>Current Data from PurpleAir Sensors</h1>
-    <div id="purpleAirData" class="purpleair">Loading PurpleAir Data...</div>
+    <div id="purpleAirData1" class="purpleair">Loading PurpleAir Data for Sensor 1...</div>
+    <div id="purpleAirData2" class="purpleair">Loading PurpleAir Data for Sensor 2...</div>
+    <div id="purpleAirData3" class="purpleair">Loading PurpleAir Data for Sensor 3...</div>
   </div>
 
   <script>
@@ -103,26 +104,23 @@
       }
 
       async function fetchPurpleAirData() {
-        const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005';
+        const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
         const sensorIds = ['178323', '27659', '223765'];
-        const url = `http://localhost:3000/purpleair?ids=${sensorIds.join(',')}`;
-        const url = `https://api.purpleair.com/v1/sensors/${sensorIds.join(',')}/?api_key=${apiKey}`;
         
         try {
-          const response = await fetch(url);
-          
-          if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-          }
+          const promises = sensorIds.map(sensorId => {
+            const url = `https://api.purpleair.com/v1/sensors/${sensorId}/?api_key=${apiKey}`;
+            return fetch(url).then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            });
+          });
 
-          const data = await response.json();
-          
-          if (!data.length) {
-            throw new Error('Sensor data is undefined');
-          }
-
-          data.forEach((sensorData, index) => {
-            const { data_time_stamp, humidity, pm2_5_atm } = sensorData;
+          const results = await Promise.all(promises);
+          results.forEach((sensorData, index) => {
+            const { data_time_stamp, humidity, pm2_5_atm } = sensorData.sensor;
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
             purpleAirDataDiv.innerHTML = `
               <p>Timestamp: ${new Date(data_time_stamp * 1000).toLocaleString()}</p>
