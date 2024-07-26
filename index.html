@@ -125,7 +125,7 @@
             purpleAirDataDiv.innerHTML = `
               <p>Timestamp: ${new Date(data_time_stamp * 1000).toLocaleString()}</p>
               <p>Humidity: ${humidity}%</p>
-              <p>PM2.5 (ATM): ${pm2_5_atm} µg/m³</p>
+              <p>PM2.5: ${pm2.5_atm} µg/m³</p>
             `;
           });
         } catch (error) {
