@@ -23,7 +23,7 @@
     <div id="communityForecastTomorrow">Loading Forecast Tomorrow...</div>
     <div id="communityForecastTonight">Loading Forecast Tonight...</div>
 
-    <h1>Current Data from PurpleAir Sensor</h1>
+    <h1>Current Data from PurpleAir Sensors</h1>
     <div id="purpleAirData" class="purpleair">Loading PurpleAir Data...</div>
   </div>
 
@@ -104,7 +104,7 @@
 
       async function fetchPurpleAirData() {
         const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005';
-        const sensorId = '193947';
+        const sensorId = '178323';
         const url = `https://api.purpleair.com/v1/sensors/${sensorId}/?api_key=${apiKey}`;
         
         try {
