@@ -12,18 +12,18 @@
 </head>
 <body>
   <div class="container">
-    <h1>Current AQHI for Edmonton Community</h1>
+    <h1>Edmonton AQHI</h1>
     <div id="communityAqhi" class="communityAqhi">Loading Community AQHI...</div>
     <div id="communityReadingDate" class="communityAqhi"></div>
     <div id="communityForecastToday" class="communityAqhi"></div>
     <div id="communityForecastTonight" class="communityAqhi"></div>
     <div id="communityForecastTomorrow" class="communityAqhi"></div>
     
-    <h1>Current AQHI at Edmonton McCauley</h1>
+    <h1>Edmonton McCauley</h1>
     <div id="mccauleyAqhi" class="aqhi">Loading AQHI...</div>
     <div id="mccauleyReadingDate" class="aqhi"></div>
 
-    <h1>Current Data from PurpleAir Sensors</h1>
+    <h1>PurpleAir Sensors</h1>
     <div id="purpleAirData1" class="purpleair">Loading PurpleAir Data for Sensor 1...</div>
     <div id="purpleAirData2" class="purpleair">Loading PurpleAir Data for Sensor 2...</div>
     <div id="purpleAirData3" class="purpleair">Loading PurpleAir Data for Sensor 3...</div>
@@ -52,7 +52,7 @@
           const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");
           if (edmontonCommunityData) {
             document.getElementById('communityAqhi').innerText = `AQHI: ${edmontonCommunityData.Aqhi}`;
-            document.getElementById('communityReadingDate').innerText = `Reading Date: ${new Date(edmontonCommunityData.ReadingDate).toLocaleString()}`;
+            document.getElementById('communityReadingDate').innerText = `${new Date(edmontonCommunityData.ReadingDate).toLocaleString()}`;
             document.getElementById('communityForecastToday').innerText = `Forecast Today: ${edmontonCommunityData.ForecastToday}`;
             document.getElementById('communityForecastTonight').innerText = `Forecast Tonight: ${edmontonCommunityData.ForecastTonight}`;
             document.getElementById('communityForecastTomorrow').innerText = `Forecast Tomorrow: ${edmontonCommunityData.ForecastTomorrow}`;
@@ -90,7 +90,7 @@
           const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
           if (edmontonMcCauleyData) {
             document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
-            document.getElementById('mccauleyReadingDate').innerText = `Reading Date: ${new Date(edmontonMcCauleyData.ReadingDate).toLocaleString()}`;
+            document.getElementById('mccauleyReadingDate').innerText = `${new Date(edmontonMcCauleyData.ReadingDate).toLocaleString()}`;
           } else {
             document.getElementById('mccauleyAqhi').innerText = 'Data not available';
             document.getElementById('mccauleyReadingDate').innerText = '';
