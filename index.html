@@ -104,8 +104,9 @@
 
       async function fetchPurpleAirData() {
         const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005';
-        const sensorId = '178323';
-        const url = `https://api.purpleair.com/v1/sensors/${sensorId}/?api_key=${apiKey}`;
+        const sensorIds = ['178323', '27659', '223765'];
+        const url = `http://localhost:3000/purpleair?ids=${sensorIds.join(',')}`;
+        const url = `https://api.purpleair.com/v1/sensors/${sensorIds.join(',')}/?api_key=${apiKey}`;
         
         try {
           const response = await fetch(url);
@@ -116,21 +117,24 @@
 
           const data = await response.json();
           
-          if (!data.sensor) {
+          if (!data.length) {
             throw new Error('Sensor data is undefined');
           }
 
-          const { data_time_stamp, humidity, pm2_5_atm } = data.sensor;
-          
-          const purpleAirDataDiv = document.getElementById('purpleAirData');
-          purpleAirDataDiv.innerHTML = `
-            <p>Timestamp: ${new Date(data_time_stamp * 1000).toLocaleString()}</p>
-            <p>Humidity: ${humidity}%</p>
-            <p>PM2.5 (ATM): ${pm2_5_atm} µg/m³</p>
-          `;
+          data.forEach((sensorData, index) => {
+            const { data_time_stamp, humidity, pm2_5_atm } = sensorData;
+            const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
+            purpleAirDataDiv.innerHTML = `
+              <p>Timestamp: ${new Date(data_time_stamp * 1000).toLocaleString()}</p>
+              <p>Humidity: ${humidity}%</p>
+              <p>PM2.5 (ATM): ${pm2_5_atm} µg/m³</p>
+            `;
+          });
         } catch (error) {
           console.error('Error fetching PurpleAir data:', error);
-          document.getElementById('purpleAirData').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData1').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData2').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData3').innerText = 'Error fetching PurpleAir data';
         }
       }
 
