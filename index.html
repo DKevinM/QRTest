@@ -30,7 +30,7 @@
   </div>
 
   <div class="legend">
-    <img src="path/to/your/legend.png" alt="Legend">
+    <img src="path/to/your/aqhilegend.png" alt="Legend">
   </div>
 
   <script>
@@ -142,7 +142,6 @@
             purpleAirDataDiv.innerHTML = `
               <p><strong>${sensorNames[index]}</strong></p>
               <p>Timestamp: ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
-              <p>Humidity: ${humidity}%</p>
               <p>PM2.5: ${adjustedPM25.toFixed(2)} µg/m³</p>
             `;
           });
