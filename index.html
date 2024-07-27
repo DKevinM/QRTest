@@ -71,7 +71,7 @@
             const adjustedPm25_atm = adjustPm25(pm2_5_atm, humidity);
 
            // Convert the Unix data_time_stamp to a human-readable date and time and add 6 hours
-            const adjustedTimestamp = new Date((data_time_stamp - (60*60*6)) * 1000);
+            const adjustedTimestamp = new Date((time_stamp - (60*60*6)) * 1000);
 
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
             purpleAirDataDiv.innerHTML = `
