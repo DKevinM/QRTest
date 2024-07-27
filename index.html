@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; }
-    .container { text-align: center; margin-top: 50px; }
-    .aqhi, .communityAqhi, .purpleair { font-size: 18px; margin-top: 20px; }
-    .legend { text-align: center; margin-top: 20px; }
+    .container { text-align: center; margin-top: 20px; }
+    .aqhi, .communityAqhi, .purpleair { font-size: 16px; margin-top: 10px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+    .legend { text-align: center; margin-top: 10px; }
     .legend img { width: 85%; max-width: 400px; }
   </style>
 </head>
@@ -36,7 +37,7 @@
  <script>
     document.addEventListener('DOMContentLoaded', async (event) => {
       const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; 
-      const sensorIds = ['178323', '27659'];
+      const sensorIds = ['178323', '223765'];
       const sensorNames = ['Riverdale', 'Gallagher Park'];
       const url = `https://api.purpleair.com/v1/sensors?fields=humidity,pm2.5_60minute,pm2.5_atm&show_only=${sensorIds.join(',')}`;
 
