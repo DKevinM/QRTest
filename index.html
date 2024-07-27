@@ -8,7 +8,7 @@
     .container { text-align: center; margin-top: 50px; }
     .aqhi, .communityAqhi, .purpleair { font-size: 18px; margin-top: 20px; }
     .legend { text-align: center; margin-top: 20px; }
-    .legend img { width: 80%; max-width: 400px; }
+    .legend img { width: 85%; max-width: 400px; }
   </style>
 </head>
 <body>
@@ -27,15 +27,65 @@
     <h1>PurpleAir Sensors</h1>
     <div id="purpleAirData1" class="purpleair">Loading PurpleAir Data for Sensor 1...</div>
     <div id="purpleAirData2" class="purpleair">Loading PurpleAir Data for Sensor 2...</div>
-    <div id="purpleAirData3" class="purpleair">Loading PurpleAir Data for Sensor 3...</div>
   </div>
 
   <div class="legend">
     <img src="aqhilegend.png" alt="Legend">
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+ <script>
+    document.addEventListener('DOMContentLoaded', async (event) => {
+      const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
+      const sensorIds = ['178323', '27659'];
+      const sensorNames = ['Riverdale', 'Gallagher Park'];
+      const url = `https://api.purpleair.com/v1/sensors?fields=humidity,pm2.5_60minute,pm2.5_atm&show_only=${sensorIds.join(',')}&max_age=604800`;
+
+      // Function to adjust PM2.5 values based on humidity
+      function adjustPm25(pm25Atm, humidity) {
+        let adjustedPm25 = pm25Atm;
+        if (humidity < 30) {
+          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / 30 - 1));
+        } else if (humidity > 70) {
+          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / 70 - 1));
+        } else {
+          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / humidity - 1));
+        }
+        return adjustedPm25;
+      }
+
+      // Fetch and adjust data for all sensors
+      async function fetchAndProcessPurpleAirData() {
+        try {
+          const response = await fetch(url, {
+            headers: {
+              'X-API-Key': API_KEY
+            }
+          });
+          const data = await response.json();
+          console.log('PurpleAir data fetched:', data);
+
+          data.data.forEach((sensorData, index) => {
+            const [sensorId, humidity, pm2_5_60minute, pm2_5_atm] = sensorData;
+            const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
+            const adjustedPm25_atm = adjustPm25(pm2_5_atm, humidity);
+
+            // Convert the Unix data_time_stamp to a human-readable date and time
+            const adjustedTimestamp = new Date((data.data_time_stamp * 1000) - (60 * 60 * 6 * 1000));
+
+            const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
+            purpleAirDataDiv.innerHTML = `
+              <p>${sensorNames[index]}  Timestamp: ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
+              <p>PM2.5 (60-min average): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
+              <p>PM2.5 (current): ${adjustedPm25_atm.toFixed(1)} µg/m³</p>
+            `;
+          });
+        } catch (error) {
+          console.error('Error fetching PurpleAir data:', error);
+          document.getElementById('purpleAirData1').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData2').innerText = 'Error fetching PurpleAir data';
+        }
+      }
+
       async function fetchCommunityAQHI() {
         const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
         try {
@@ -103,71 +153,9 @@
         }
       }
 
-      async function fetchPurpleAirData() {
-        const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
-        const sensorIds = ['178323', '27659'];
-        const sensorNames = ['Riverdale', 'Gallagher Park'];
-        const url = `https://api.purpleair.com/v1/sensors/${sensorId}/history'
-        let communityReadingDate = null;
-        let startTime = null;
-        let endTime = new Date().toISOString(); // Default end time to now
-
-// Function to fetch data for a sensor
-      async function fetchSensorData(sensorId, startTime, endTime) {
-        const url = `https://api.purpleair.com/v1/sensors/${sensorId}?start=${startTime}&end=${endTime}`;
-        const response = await fetch(url, {
-          headers: {
-            'X-API-Key': API_KEY
-          }
-        });
-        const data = await response.json();
-        return data.data.map(item => {
-          const record = {};
-          data.fields.forEach((field, index) => {
-            record[field] = item[index];
-          });
-          return record;
-        });
-      }
-
-      // Function to adjust PM2.5 values based on humidity
-      function adjustPm25(pm25Atm, humidity) {
-        let adjustedPm25 = pm25Atm;
-        if (humidity < 30) {
-          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / 30 - 1));
-        } else if (humidity > 70) {
-          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / 70 - 1));
-        } else {
-          adjustedPm25 = pm25Atm / (1 + 0.24 / (100 / humidity - 1));
-        }
-        return adjustedPm25;
-      }
-      
-      // Fetch and adjust data for all sensors
-      async function fetchAndProcessPurpleAirData() {
-        const allData = [];
-        for (const [index, sensorId] of sensorIds.entries()) {
-          const data = await fetchSensorData(sensorId, startTime, endTime);
-          const adjustedData = data.map(record => {
-            record.adjusted_pm25 = adjustPm25(record['pm2.5_atm'], record.humidity);
-            return record;
-          });
-          allData.push({ sensorId, data: adjustedData });
-
-        // Display the latest data for each sensor
-          const latestRecord = adjustedData[0]; // Assuming the latest record is the first one
-          const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
-          const adjustedTimestamp = new Date((latestRecord.data_time_stamp * 1000) - (60 * 60 * 6 * 1000));
-          purpleAirDataDiv.innerHTML = `
-            <p>${sensorNames[index]}  ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
-            <p>PM2.5: ${latestRecord.adjusted_pm25.toFixed(1)} µg/m³</p>
-          `;
-        }
-      }
-
-      fetchCommunityAQHI();
-      fetchMccauleyAQHI();
-      fetchAndProcessPurpleAirData();
+      await fetchCommunityAQHI();
+      await fetchMccauleyAQHI();
+      await fetchAndProcessPurpleAirData();
     });
   </script>
 </body>
