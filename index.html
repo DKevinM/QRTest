@@ -8,6 +8,7 @@
     .container { text-align: center; margin-top: 50px; }
     .aqhi, .communityAqhi, .purpleair { font-size: 18px; margin-top: 20px; }
     .legend { text-align: center; margin-top: 20px; }
+    .legend img { width: 80%; max-width: 400px; }
   </style>
 </head>
 <body>
@@ -105,7 +106,7 @@
       async function fetchPurpleAirData() {
         const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
         const sensorIds = ['178323', '27659', '223765'];
-        const sensorNames = ['Riverdale', 'ACA park', 'ACA Park2'];
+        const sensorNames = ['Riverdale', 'Gallagher Park', 'Cloverdale'];
         
         try {
           console.log('Fetching PurpleAir data...');
@@ -125,8 +126,9 @@
           results.forEach((sensorData, index) => {
             const { data_time_stamp, humidity, "pm2.5_atm": pm25_atm } = sensorData.sensor;
             
-            // Adjust the time stamp
-            const adjustedTimestamp = (data_time_stamp);   
+           // Adjust the time stamp
+            const adjustedTimestamp = new Date((data_time_stamp * 1000) - (60 * 60 * 6 * 1000));
+
             
             // Adjust PM2.5 values based on relative humidity
             let adjustedPM25 = pm25_atm;
@@ -140,8 +142,7 @@
 
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
             purpleAirDataDiv.innerHTML = `
-              <p><strong>${sensorNames[index]}</strong></p>
-              <p>${adjustedTimestamp}</p>
+              <p>${sensorNames[index]}  ${adjustedTimestamp}</p>
               <p>PM2.5: ${adjustedPM25.toFixed(1)} µg/m³</p>
             `;
           });
