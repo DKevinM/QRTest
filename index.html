@@ -30,7 +30,7 @@
   </div>
 
   <div class="legend">
-    <img src="path/to/your/aqhilegend.png" alt="Legend">
+    <img src="aqhilegend.png" alt="Legend">
   </div>
 
   <script>
@@ -105,7 +105,7 @@
       async function fetchPurpleAirData() {
         const apiKey = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
         const sensorIds = ['178323', '27659', '223765'];
-        const sensorNames = ['Riverdale', 'Sensor 2', 'Sensor 3']; // Add appropriate names for each sensor
+        const sensorNames = ['Riverdale', 'ACA park', 'ACA Park2'];
         
         try {
           console.log('Fetching PurpleAir data...');
@@ -126,7 +126,7 @@
             const { data_time_stamp, humidity, "pm2.5_atm": pm25_atm } = sensorData.sensor;
             
             // Adjust the time stamp
-            const adjustedTimestamp = moment(data_time_stamp).format("YYYY-MM-DD HH:mm");   
+            const adjustedTimestamp = (data_time_stamp);   
             
             // Adjust PM2.5 values based on relative humidity
             let adjustedPM25 = pm25_atm;
@@ -142,7 +142,7 @@
             purpleAirDataDiv.innerHTML = `
               <p><strong>${sensorNames[index]}</strong></p>
               <p>${adjustedTimestamp}</p>
-              <p>PM2.5: ${adjustedPM25.toFixed(2)} µg/m³</p>
+              <p>PM2.5: ${adjustedPM25.toFixed(1)} µg/m³</p>
             `;
           });
         } catch (error) {
