@@ -35,10 +35,10 @@
 
  <script>
     document.addEventListener('DOMContentLoaded', async (event) => {
-      const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; // Replace with your actual API key
+      const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; 
       const sensorIds = ['178323', '27659'];
       const sensorNames = ['Riverdale', 'Gallagher Park'];
-      const url = `https://api.purpleair.com/v1/sensors?fields=humidity,pm2.5_60minute,pm2.5_atm&show_only=${sensorIds.join(',')}&max_age=604800`;
+      const url = `https://api.purpleair.com/v1/sensors?fields=humidity,pm2.5_60minute,pm2.5_atm&show_only=${sensorIds.join(',')}`;
 
       // Function to adjust PM2.5 values based on humidity
       function adjustPm25(pm25Atm, humidity) {
@@ -75,8 +75,8 @@
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
             purpleAirDataDiv.innerHTML = `
               <p>${sensorNames[index]}  Timestamp: ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
-              <p>PM2.5 (60-min average): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
-              <p>PM2.5 (current): ${adjustedPm25_atm.toFixed(1)} µg/m³</p>
+              <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
+              <p>PM2.5 (past 10min): ${adjustedPm25_atm.toFixed(1)} µg/m³</p>
             `;
           });
         } catch (error) {
