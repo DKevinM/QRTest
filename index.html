@@ -65,15 +65,17 @@
           const data = await response.json();
           console.log(`Data for sensor ${sensorId}:`, data);
 
-          if (!data.sensor || !data.stats) {
-            throw new Error(`Data structure is not as expected for sensor ${sensorId}`);
-          }
+          // Accessing nested properties
+          const timeStamp = data.stats?.["time_stamp"];
+          const humidity = data.sensor?.["humidity"];
+          const pm2_5_10minute = data.stats?.["pm2.5_10minute"];
+          const pm2_5_60minute = data.stats?.["pm2.5_60minute"];
           
           return {
+            timeStamp: timeStamp,
             humidity: humidity,
-            pm2_5_10minute: ["pm2.5_10minute"],
-            pm2_5_60minute: ["pm2.5_60minute"]
-            timeStamp: time_stamp,
+            pm2_5_10minute: pm2_5_10minute,
+            pm2_5_60minute: pm2_5_60minute
           };
         } catch (error) {
           console.error(`Error fetching data for sensor ${sensorId}:`, error);
