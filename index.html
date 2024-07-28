@@ -88,7 +88,11 @@
         try {
           const allData = await Promise.all(sensorIds.map(fetchSensorData));
           allData.forEach((sensorData, index) => {
-            if (!sensorData) return;
+            if (!sensorData) {
+              console.error(`No data for sensor ${sensorIds[index]}`);
+              document.getElementById(`purpleAirData${index + 1}`).innerText = 'No data available';
+              return;
+            }
 
             const { timeStamp, humidity, pm2_5_10minute, pm2_5_60minute } = sensorData;
             const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
