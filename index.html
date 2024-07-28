@@ -65,10 +65,10 @@
           const data = await response.json();
           console.log(`Data for sensor ${sensorId}:`, data);
           return {
-            timeStamp: data.stats.time_stamp,
-            humidity: data.sensor.humidity,
-            pm2_5_10minute: data.stats["pm2.5_10minute"],
-            pm2_5_60minute: data.stats["pm2.5_60minute"]
+            timeStamp: stats.time_stamp,
+            humidity: sensor.humidity,
+            pm2_5_10minute: stats["pm2.5_10minute"],
+            pm2_5_60minute: stats["pm2.5_60minute"]
           };
         } catch (error) {
           console.error(`Error fetching data for sensor ${sensorId}:`, error);
