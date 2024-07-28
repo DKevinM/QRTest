@@ -65,7 +65,7 @@
           const data = await response.json();
           console.log(`Data for sensor ${sensorId}:`, data);
           return {
-            timeStamp: time_stamp,
+            timeStamp: data_time_stamp,
             humidity: humidity,
             pm2_5_10minute: ["pm2.5_10minute"],
             pm2_5_60minute: ["pm2.5_60minute"]
