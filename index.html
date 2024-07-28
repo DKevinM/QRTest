@@ -55,14 +55,20 @@
 
       async function fetchSensorData(sensorId) {
         const url = `https://api.purpleair.com/v1/sensors/${sensorId}/?api_key=${API_KEY}`;
+        console.log(`Fetching data for sensor ${sensorId} from URL: ${url}`);
         try {
           const response = await fetch(url);
+          console.log(`Response for sensor ${sensorId}:`, response);
+          if (!response.ok) {
+            throw new Error(`Network response was not ok for sensor ${sensorId}: ${response.statusText}`);
+          }
           const data = await response.json();
+          console.log(`Data for sensor ${sensorId}:`, data);
           return {
-            timeStamp: data_time_stamp,
-            humidity: humidity,
-            pm2_5_10minute: ["pm2.5_10minute"],
-            pm2_5_60minute: ["pm2.5_60minute"]
+            timeStamp: data.stats.time_stamp,
+            humidity: data.sensor.humidity,
+            pm2_5_10minute: data.stats["pm2.5_10minute"],
+            pm2_5_60minute: data.stats["pm2.5_60minute"]
           };
         } catch (error) {
           console.error(`Error fetching data for sensor ${sensorId}:`, error);
