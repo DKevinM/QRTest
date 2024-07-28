@@ -67,13 +67,13 @@
           console.log('PurpleAir data fetched:', data);
 
           data.data.forEach((sensorData, index) => {
-            const [sensorId, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
+            const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
             const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
             const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
 
 
             // Adjust the timestamp to the local timezone
-            const adjustedTimestamp = new Date((timeStamp - (60 * 60 * 6)) * 1000);
+            const adjustedTimestamp = new Date((last_seen - (60 * 60 * 6)) * 1000);
 
             const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
             purpleAirDataDiv.innerHTML = `
