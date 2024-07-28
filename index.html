@@ -53,37 +53,26 @@
         return adjustedPm25;
       }
 
-      async function fetchSensorData(sensorId) {
+    async function fetchSensorData(sensorId) {
         const url = `https://api.purpleair.com/v1/sensors/${sensorId}/?api_key=${API_KEY}`;
         console.log(`Fetching data for sensor ${sensorId} from URL: ${url}`);
         try {
           const response = await fetch(url);
-          console.log(`Response for sensor ${sensorId}:`, response);
           if (!response.ok) {
             throw new Error(`Network response was not ok for sensor ${sensorId}: ${response.statusText}`);
           }
           const data = await response.json();
           console.log(`Data for sensor ${sensorId}:`, data);
 
-          // Check the structure of the data
-          console.log('Sensor data:', data.sensor);
-          console.log('Stats data:', data.stats);
+          // Extracting data from the `stats` object
+          const { time_stamp, ["pm2.5_10minute"], ["pm2.5_60minute"] } = data.stats;
+          const humidity = data.sensor.humidity;
 
-          // Ensure properties exist before accessing them
-          const timeStamp = data.stats ? data.stats.time_stamp : null;
-          const humidity = data.sensor ? data.sensor.humidity : null;
-          const pm2_5_10minute = data.stats ? data.stats["pm2.5_10minute"] : null;
-          const pm2_5_60minute = data.stats ? data.stats["pm2.5_60minute"] : null;
-
-          if (timeStamp === null || humidity === null || pm2_5_10minute === null || pm2_5_60minute === null) {
-            throw new Error(`Missing expected data for sensor ${sensorId}`);
-          }
-          
           return {
-            timeStamp: timeStamp,
+            timeStamp: time_stamp,
             humidity: humidity,
-            pm2_5_10minute: pm2_5_10minute,
-            pm2_5_60minute: pm2_5_60minute
+            pm2_5_10minute: ["pm2.5_10minute"],
+            pm2_5_60minute: ["pm2.5_60minute"]
           };
         } catch (error) {
           console.error(`Error fetching data for sensor ${sensorId}:`, error);
