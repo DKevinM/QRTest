@@ -64,6 +64,11 @@
           }
           const data = await response.json();
           console.log(`Data for sensor ${sensorId}:`, data);
+
+          if (!data.sensor || !data.stats) {
+            throw new Error(`Data structure is not as expected for sensor ${sensorId}`);
+          }
+          
           return {
             timeStamp: data.stats.time_stamp,
             humidity: data.sensor.humidity,
