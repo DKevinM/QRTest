@@ -44,7 +44,7 @@
             L.circle([lat, lng], {
                 color: color,
                 fillColor: color,
-                fillOpacity: 0.5,
+                fillOpacity: 0.2,
                 radius: aqhi * 150
             }).addTo(map)
             .bindPopup(`<b>Site:</b> ${site}<br><b>AQHI:</b> ${aqhi}<br><b>Date:</b> ${date}`);
@@ -65,7 +65,7 @@
             L.circle([lat, lng], {
                 color: color,
                 fillColor: color,
-                fillOpacity: 0.5,
+                fillOpacity: 0.2,
                 radius: pm25 * 150
             }).addTo(map)
             .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}<br><b>Date:</b> ${date}`);            
