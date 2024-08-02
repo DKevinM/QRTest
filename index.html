@@ -84,9 +84,9 @@
         async function fetchPurpleAirData() {
             const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
             const sensorMapping = {
-                '178323': {name: 'Riverdale', coordinates: [53.5563, -113.4642]},
-                '223765': {name: 'Gallagher Park', coordinates: [53.5398, -113.4730]},
-                '27659': {name: 'Cloverdale', coordinates: [53.5499, -113.4719]}
+                '178323': {name: 'Riverdale', coordinates: [53.542114, -113.464294]},
+                '223765': {name: 'Gallagher Park', coordinates: [53.532684, -113.47296]},
+                '27659': {name: 'Cloverdale', coordinates: [53.535645, -113.47194]}
             };
             const sensorIds = Object.keys(sensorMapping);
             const purpleAirUrl = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
