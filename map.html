@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping and Displaying Data</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .aqhi-label {
+            color: black;
+            font-size: 14px;
+            font-weight: bold;
+            background: transparent;
+            text-align: center;
+            line-height: 1;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([53.549509, -113.48593], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a station to the map
+        function addStationToMap(lat, lng, aqhi, site, date) {
+            const color = aqhi <= 3 ? 'green' : aqhi <= 6 ? 'orange' : 'red';
+            L.circle([lat, lng], {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.5,
+                radius: aqhi * 250
+            }).addTo(map)
+            .bindPopup(`<b>Site:</b> ${site}<br><b>AQHI:</b> ${aqhi}<br><b>Date:</b> ${date}`);
+
+            const icon = L.divIcon({
+                className: 'aqhi-label',
+                html: aqhi,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            L.marker([lat, lng], {icon: icon}).addTo(map);
+        }
+
+        // Add PurpleAir sensor to the map
+        function addPurpleAirSensor(lat, lng, pm25, name, date) {
+            const color = pm25 <= 3 ? 'green' : pm25 <= 6 ? 'orange' : 'red';
+            L.circle([lat, lng], {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.5,
+                radius: pm25 * 250
+            }).addTo(map)
+            .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}<br><b>Date:</b> ${date}`);
+
+            const icon = L.divIcon({
+                className: 'aqhi-label',
+                html: pm25,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            L.marker([lat, lng], {icon: icon}).addTo(map);
+        }
+
+        window.addEventListener('message', (event) => {
+            const { type, data } = event.data;
+            if (type === 'mccauley') {
+                addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
+            } else if (type === 'purpleair') {
+                const sensorLocations = {
+                    '178323': [53.5563, -113.4642],
+                    '223765': [53.5398, -113.4730],
+                    '27659': [53.5499, -113.4719]
+                };
+                addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
+            }
+        });
+
+        window.onload = () => {
+            window.parent.postMessage('ready', '*');
+        };
+    </script>
+</body>
+</html>
