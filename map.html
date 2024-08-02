@@ -12,12 +12,17 @@
         }
         .aqhi-label {
             color: black;
-            font-size: 18px;
-            font-weight: bold;
             background: transparent;
             text-align: center;
             line-height: 1;
             border-radius: 50%;
+        }
+        .mccauley-label {
+            font-size: 18px; /* Larger font size for McCauley */
+            font-weight: bold;
+        }
+        .purpleair-label {
+            font-size: 12px; /* Smaller font size for PurpleAir */
         }
     </style>
 </head>
@@ -44,7 +49,7 @@
             .bindPopup(`<b>Site:</b> ${site}<br><b>AQHI:</b> ${aqhi}<br><b>Date:</b> ${date}`);
 
             const icon = L.divIcon({
-                className: 'aqhi-label',
+                className: 'aqhi-label mccauley-label', 
                 html: aqhi,
                 iconSize: [30, 30],
                 iconAnchor: [15, 15]
@@ -64,7 +69,7 @@
             }).addTo(map)
             .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}<br><b>Date:</b> ${date}`);            
             const icon = L.divIcon({
-                className: 'aqhi-label',
+                className: 'aqhi-label purpleair-label',
                 html: `${pm25} µg/m³`,
                 iconSize: [30, 30],
                 iconAnchor: [15, 15]
