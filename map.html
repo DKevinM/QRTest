@@ -12,7 +12,7 @@
         }
         .aqhi-label {
             color: black;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
             background: transparent;
             text-align: center;
@@ -27,19 +27,19 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         // Initialize the map
-        const map = L.map('map').setView([53.549509, -113.48593], 12);
+        const map = L.map('map').setView([53.535645, -113.47194], 8);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
         // Add a station to the map
         function addStationToMap(lat, lng, aqhi, site, date) {
-            const color = aqhi <= 3 ? 'green' : aqhi <= 6 ? 'orange' : 'red';
+            const color = aqhi <= 3 ? 'blue' : aqhi <= 6 ? 'orange' : aqhi <= 10 ? 'red' : 'brown';
             L.circle([lat, lng], {
                 color: color,
                 fillColor: color,
                 fillOpacity: 0.5,
-                radius: aqhi * 250
+                radius: aqhi * 100
             }).addTo(map)
             .bindPopup(`<b>Site:</b> ${site}<br><b>AQHI:</b> ${aqhi}<br><b>Date:</b> ${date}`);
 
@@ -55,12 +55,12 @@
 
         // Add PurpleAir sensor to the map
         function addPurpleAirSensor(lat, lng, pm25, name, date) {
-            const color = pm25 <= 3 ? 'green' : pm25 <= 6 ? 'orange' : 'red';
+            const color = pm25 <= 30 ? 'blue' : pm25 <= 60 ? 'orange' : aqhi <= 100 ? 'red' : 'brown';
             L.circle([lat, lng], {
                 color: color,
                 fillColor: color,
                 fillOpacity: 0.5,
-                radius: pm25 * 250
+                radius: pm25 * 100
             }).addTo(map)
             .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}<br><b>Date:</b> ${date}`);
 
@@ -80,9 +80,9 @@
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
                 const sensorLocations = {
-                    '178323': [53.5563, -113.4642],
-                    '223765': [53.5398, -113.4730],
-                    '27659': [53.5499, -113.4719]
+                    '178323': [53.542114, -113.464294],
+                    '223765': [53.532684, -113.47296],
+                    '27659': [53.535645, -113.47194]
                 };
                 addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
             }
