@@ -3,22 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQHI Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <title>Data Fetching and Processing</title>
     <style>
-        #map {
-            height: 600px;
-            width: 100%;
-        }
-        .aqhi-label {
-            color: black;
-            font-size: 14px;
-            font-weight: bold;
-            background: transparent;
-            text-align: center;
-            line-height: 1;
-            border-radius: 50%;
-        }
         body { font-family: Arial, sans-serif; }
         .container { text-align: center; margin-top: 20px; }
         .aqhi, .communityAqhi, .purpleair { font-size: 16px; margin-top: 10px; }
@@ -28,9 +14,6 @@
     </style>
 </head>
 <body>
-    <h1>AQHI Map for Edmonton McCauley</h1>
-    <div id="map"></div>
-
     <div class="container">
         <h1>Edmonton AQHI</h1>
         <div id="communityAqhi" class="communityAqhi">Loading Community AQHI...</div>
@@ -38,7 +21,7 @@
         <div id="communityForecastToday" class="communityAqhi"></div>
         <div id="communityForecastTonight" class="communityAqhi"></div>
         <div id="communityForecastTomorrow" class="communityAqhi"></div>
-        
+
         <h1>Edmonton McCauley</h1>
         <div id="mccauleyAqhi" class="aqhi">Loading AQHI...</div>
         <div id="mccauleyReadingDate" class="aqhi"></div>
@@ -53,46 +36,47 @@
         <img src="aqhilegend.png" alt="Legend">
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <iframe src="map.html" id="mapFrame" style="width: 100%; height: 600px;"></iframe>
+
     <script>
-        // Initialize the map
-        function initializeMap() {
-            console.log('Initializing map...');
-            const map = L.map('map').setView([53.549509, -113.48593], 12); // Center on Edmonton McCauley
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            return map;
+        // Fetch Community AQHI data
+        async function fetchCommunityAQHI() {
+            const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");
+                if (edmontonCommunityData) {
+                    document.getElementById('communityAqhi').innerText = `AQHI: ${edmontonCommunityData.Aqhi}`;
+                    document.getElementById('communityReadingDate').innerText = new Date(edmontonCommunityData.ReadingDate).toLocaleString();
+                    document.getElementById('communityForecastToday').innerText = `Forecast Today: ${edmontonCommunityData.ForecastToday}`;
+                    document.getElementById('communityForecastTonight').innerText = `Forecast Tonight: ${edmontonCommunityData.ForecastTonight}`;
+                    document.getElementById('communityForecastTomorrow').innerText = `Forecast Tomorrow: ${edmontonCommunityData.ForecastTomorrow}`;
+                }
+            } catch (error) {
+                console.error('Error fetching Community AQHI data:', error);
+            }
         }
 
-        // Add a station to the map
-        function addStationToMap(map, lat, lng, aqhi, site, date) {
-            console.log(`Adding station to map: ${site}, AQHI: ${aqhi}`);
-            const color = aqhi <= 3 ? 'green' : aqhi <= 6 ? 'orange' : 'red';
-
-            // Create a circle for the AQHI value
-            L.circle([lat, lng], {
-                color: color,
-                fillColor: color,
-                fillOpacity: 0.5,
-                radius: aqhi * 250
-            }).addTo(map)
-            .bindPopup(`<b>Site:</b> ${site}<br><b>AQHI:</b> ${aqhi}<br><b>Date:</b> ${date}`);
-
-            // Add a label in the middle of the circle
-            const icon = L.divIcon({
-                className: 'aqhi-label',
-                html: aqhi,
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-
-            L.marker([lat, lng], {icon: icon}).addTo(map);
+        // Fetch Edmonton McCauley AQHI data
+        async function fetchMccauleyAQHI() {
+            const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
+                if (edmontonMcCauleyData) {
+                    document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
+                    document.getElementById('mccauleyReadingDate').innerText = new Date(edmontonMcCauleyData.ReadingDate).toLocaleString();
+                    sendToMap('mccauley', edmontonMcCauleyData);
+                }
+            } catch (error) {
+                console.error('Error fetching McCauley AQHI data:', error);
+            }
         }
 
         // Fetch and process PurpleAir data
-        async function fetchAndProcessPurpleAirData(map) {
-            console.log('Fetching PurpleAir data...');
+        async function fetchPurpleAirData() {
             const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
             const sensorIds = ['178323', '223765', '27659'];
             const sensorNames = ['Riverdale', 'Gallagher Park', 'Cloverdale'];
@@ -117,116 +101,50 @@
                     }
                 });
                 const data = await response.json();
-                console.log('PurpleAir data fetched:', data);
-
                 data.data.forEach((sensorData, index) => {
                     const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
                     const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
                     const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
-
-                    const adjustedTimestamp = new Date(last_seen * 1000);
+                    const sensorName = sensorNames[index];
 
                     const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
                     purpleAirDataDiv.innerHTML = `
-                        <p>${sensorNames[index]} at ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
+                        <p>${sensorName} at ${new Date(last_seen * 1000).toLocaleString()}</p>
                         <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
                         <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
                     `;
 
-                    const sensorLocations = {
-                        '178323': [53.5563, -113.4642],
-                        '223765': [53.5398, -113.4730],
-                        '27659': [53.5499, -113.4719]
-                    };
-
-                    addStationToMap(map, sensorLocations[sensorId][0], sensorLocations[sensorId][1], adjustedPm25_60minute.toFixed(1), sensorNames[index], adjustedTimestamp.toLocaleString());
+                    sendToMap('purpleair', {
+                        id: sensorId,
+                        name: sensorName,
+                        lastSeen: new Date(last_seen * 1000).toLocaleString(),
+                        pm25_60: adjustedPm25_60minute.toFixed(1),
+                        pm25_10: adjustedPm25_10minute.toFixed(1),
+                        humidity: humidity
+                    });
                 });
             } catch (error) {
-                console.error('Error processing PurpleAir data:', error);
-                document.getElementById('purpleAirData1').innerText = 'Error fetching PurpleAir data';
-                document.getElementById('purpleAirData2').innerText = 'Error fetching PurpleAir data';
-                document.getElementById('purpleAirData3').innerText = 'Error fetching PurpleAir data';
+                console.error('Error fetching PurpleAir data:', error);
             }
         }
 
-        // Fetch Community AQHI data
-        async function fetchCommunityAQHI() {
-            const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
-            try {
-                console.log('Fetching Community AQHI data...');
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                const data = await response.json();
-                console.log('Community AQHI data fetched:', data);
-
-                if (!data.value) {
-                    throw new Error('Data value is undefined');
-                }
-                const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");
-                if (edmontonCommunityData) {
-                    document.getElementById('communityAqhi').innerText = `AQHI: ${edmontonCommunityData.Aqhi}`;
-                    document.getElementById('communityReadingDate').innerText = `${new Date(edmontonCommunityData.ReadingDate).toLocaleString()}`;
-                    document.getElementById('communityForecastToday').innerText = `Forecast Today: ${edmontonCommunityData.ForecastToday}`;
-                    document.getElementById('communityForecastTonight').innerText = `Forecast Tonight: ${edmontonCommunity.innerText = `Forecast Tonight: ${edmontonCommunityData.ForecastTonight}`;
-                    document.getElementById('communityForecastTomorrow').innerText = `Forecast Tomorrow: ${edmontonCommunityData.ForecastTomorrow}`;
-                } else {
-                    document.getElementById('communityAqhi').innerText = 'Data not available';
-                    document.getElementById('communityReadingDate').innerText = '';
-                    document.getElementById('communityForecastToday').innerText = '';
-                    document.getElementById('communityForecastTonight').innerText = '';
-                    document.getElementById('communityForecastTomorrow').innerText = '';
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('communityAqhi').innerText = 'Error fetching data';
-                document.getElementById('communityReadingDate').innerText = '';
-                document.getElementById('communityForecastToday').innerText = '';
-                document.getElementById('communityForecastTonight').innerText = '';
-                document.getElementById('communityForecastTomorrow').innerText = '';
-            }
+        function sendToMap(type, data) {
+            const iframe = document.getElementById('mapFrame');
+            iframe.contentWindow.postMessage({ type, data }, '*');
         }
 
-        // Fetch Edmonton McCauley AQHI data
-        async function fetchMccauleyAQHI(map) {
-            const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/StationAqhis?$format=json";
-            try {
-                console.log('Fetching McCauley AQHI data...');
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                const data = await response.json();
-                console.log('McCauley AQHI data fetched:', data);
-
-                if (!data.value) {
-                    throw new Error('Data value is undefined');
-                }
-                const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
-                if (edmontonMcCauleyData) {
-                    document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
-                    document.getElementById('mccauleyReadingDate').innerText = `${new Date(edmontonMcCauleyData.ReadingDate).toLocaleString()}`;
-
-                    addStationToMap(map, 53.549509, -113.48593, edmontonMcCauleyData.Aqhi, "Edmonton McCauley", new Date(edmontonMcCauleyData.ReadingDate).toLocaleString());
-                } else {
-                    document.getElementById('mccauleyAqhi').innerText = 'Data not available';
-                    document.getElementById('mccauleyReadingDate').innerText = '';
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('mccauleyAqhi').innerText = 'Error fetching data';
-                document.getElementById('mccauleyReadingDate').innerText = '';
+        window.addEventListener('message', (event) => {
+            if (event.data === 'ready') {
+                fetchCommunityAQHI();
+                fetchMccauleyAQHI();
+                fetchPurpleAirData();
             }
-        }
+        });
 
-        // Main function to fetch all data and initialize the map
-        document.addEventListener('DOMContentLoaded', async () => {
-            const map = initializeMap();
-            
-            await fetchCommunityAQHI();
-            await fetchMccauleyAQHI(map);
-            await fetchAndProcessPurpleAirData(map);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCommunityAQHI();
+            fetchMccauleyAQHI();
+            fetchPurpleAirData();
         });
     </script>
 </body>
