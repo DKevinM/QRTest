@@ -39,6 +39,11 @@
     <iframe src="map.html" id="mapFrame" style="width: 100%; height: 600px;"></iframe>
 
     <script>
+         // Function to ensure AQHI does not exceed 10
+        function validateAQHI(aqhi) {
+            return aqhi > 10 ? '10+' : aqhi;
+        }
+        
         // Fetch Community AQHI data
         async function fetchCommunityAQHI() {
             const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
