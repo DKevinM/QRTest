@@ -112,6 +112,8 @@
                     const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
                     const sensorName = sensorNames[index];
 
+                    console.log(`Sensor ID: ${sensorId}, Sensor Name: ${sensorName}`);
+
                     const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
                     purpleAirDataDiv.innerHTML = `
                         <p>${sensorName} at ${new Date(last_seen * 1000).toLocaleString()}</p>
