@@ -121,16 +121,16 @@
                     const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
                     purpleAirDataDiv.innerHTML = `
                         <p>${sensorName} at ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
-                        <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
-                        <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
+                        <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(0)} µg/m³</p>
+                        <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(0)} µg/m³</p>
                     `;
 
                     sendToMap('purpleair', {
                         id: sensorId,
                         name: sensorName,
                         lastSeen: adjustedTimestamp.toLocaleString(),
-                        pm25_60: adjustedPm25_60minute.toFixed(1),
-                        pm25_10: adjustedPm25_10minute.toFixed(1)
+                        pm25_60: adjustedPm25_60minute.toFixed(0),
+                        pm25_10: adjustedPm25_10minute.toFixed(0)
                     });
                 });
             } catch (error) {
