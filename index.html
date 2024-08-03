@@ -81,16 +81,12 @@
         }
 
         // Fetch and process PurpleAir data
-        async function fetchPurpleAirData() {
-            const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
-            const sensorIds = ['178323', '223765', '27659'];
-            const sensorMapping = {
-                '178323': {name: 'Riverdale', coordinates: [53.542114, -113.464294]},
-                '223765': {name: 'Gallagher Park', coordinates: [53.532684, -113.47296]},
-                '27659': {name: 'Cloverdale', coordinates: [53.535645, -113.47194]}
-            };
-            const sensorIds = Object.keys(sensorMapping);
-            const purpleAirUrl = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
+    document.addEventListener('DOMContentLoaded', async (event) => {
+      const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; 
+      const sensorIds = ['178323', '223765', '27659'];
+      const sensorNames = ['Riverdale', 'Gallagher Park', 'Cloverdale'];
+      const url = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
+
 
             function adjustPm25(pm25, humidity) {
                 let adjustedPm25 = pm25;
@@ -104,42 +100,42 @@
                 return adjustedPm25;
             }
 
-            try {
-                const response = await fetch(purpleAirUrl, {
-                    headers: {
-                        'X-API-Key': API_KEY
-                    }
-                });
-                const data = await response.json();
-                data.data.forEach((sensorData => {
-                    const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
-                    const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
-                    const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
-                    const sensorInfo = sensorMapping[sensorId];
-
-                    const purpleAirDataDiv = document.getElementById(`purpleAirData${sensorIds.indexOf(sensorId) + 1}`);
-                    purpleAirDataDiv.innerHTML = `
-                        <p>${sensorInfo.name} at ${new Date(last_seen * 1000).toLocaleString()}</p>
-                        <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
-                        <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
-                    `;
-
-                    sendToMap('purpleair', {
-                        id: sensorId,
-                        name: sensorInfo.name,
-                        lastSeen: new Date(last_seen * 1000).toLocaleString(),
-                        pm25_60: adjustedPm25_60minute.toFixed(1),
-                        pm25_10: adjustedPm25_10minute.toFixed(1),
-                        coordinates: sensorInfo.coordinates
-                    });
-                });
-            } catch (error) {
-                console.error('Error fetching PurpleAir data:', error);
+      // Fetch and adjust data for all sensors
+      async function fetchAndProcessPurpleAirData() {
+        try {
+          const response = await fetch(url, {
+            headers: {
+              'X-API-Key': API_KEY
             }
+          });
+          const data = await response.json();
+          console.log('PurpleAir data fetched:', data);
+
+          data.data.forEach((sensorData, index) => {
+            const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
+            const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
+            const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
+
+
+            // Adjust the timestamp to the local timezone
+            const adjustedTimestamp = new Date((last_seen) * 1000);
+
+            const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
+            purpleAirDataDiv.innerHTML = `
+              <p>${sensorNames[index]} at ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
+              <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
+              <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
+            `;
+          });
+        } catch (error) {
+          console.error('Error processing PurpleAir data:', error);
+          document.getElementById('purpleAirData1').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData2').innerText = 'Error fetching PurpleAir data';
+          document.getElementById('purpleAirData3').innerText = 'Error fetching PurpleAir data';
         }
+      }
 
         function sendToMap(type, data) {
-            console.log(`Sending to map: ${JSON.stringify(data)}`);
             const iframe = document.getElementById('mapFrame');
             iframe.contentWindow.postMessage({ type, data }, '*');
         }
