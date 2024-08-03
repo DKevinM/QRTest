@@ -39,11 +39,11 @@
     <iframe src="map.html" id="mapFrame" style="width: 100%; height: 600px;"></iframe>
 
     <script>
-         // Function to ensure AQHI does not exceed 10
+        // Function to ensure AQHI does not exceed 10
         function validateAQHI(aqhi) {
             return aqhi > 10 ? '10+' : aqhi;
         }
-        
+
         // Fetch Community AQHI data
         async function fetchCommunityAQHI() {
             const url = "https://data.environment.alberta.ca/EdwServices/aqhi/odata/CommunityAqhis?$format=json";
@@ -52,7 +52,7 @@
                 const data = await response.json();
                 const edmontonCommunityData = data.value.find(community => community.CommunityName === "Edmonton");
                 if (edmontonCommunityData) {
-                    document.getElementById('communityAqhi').innerText = `AQHI: ${edmontonCommunityData.Aqhi}`;
+                    document.getElementById('communityAqhi').innerText = `AQHI: ${validateAQHI(edmontonCommunityData.Aqhi)}`;
                     document.getElementById('communityReadingDate').innerText = new Date(edmontonCommunityData.ReadingDate).toLocaleString();
                     document.getElementById('communityForecastToday').innerText = `Forecast Today: ${edmontonCommunityData.ForecastToday}`;
                     document.getElementById('communityForecastTonight').innerText = `Forecast Tonight: ${edmontonCommunityData.ForecastTonight}`;
@@ -71,9 +71,10 @@
                 const data = await response.json();
                 const edmontonMcCauleyData = data.value.find(station => station.StationName === "Edmonton McCauley");
                 if (edmontonMcCauleyData) {
-                    document.getElementById('mccauleyAqhi').innerText = `AQHI: ${edmontonMcCauleyData.Aqhi}`;
+                    const validatedAQHI = validateAQHI(edmontonMcCauleyData.Aqhi);
+                    document.getElementById('mccauleyAqhi').innerText = `AQHI: ${validatedAQHI}`;
                     document.getElementById('mccauleyReadingDate').innerText = new Date(edmontonMcCauleyData.ReadingDate).toLocaleString();
-                    sendToMap('mccauley', edmontonMcCauleyData);
+                    sendToMap('mccauley', {...edmontonMcCauleyData, Aqhi: validatedAQHI });
                 }
             } catch (error) {
                 console.error('Error fetching McCauley AQHI data:', error);
@@ -81,11 +82,15 @@
         }
 
         // Fetch and process PurpleAir data
-      async function fetchPurpleAirData() {
-      const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005'; 
-      const sensorIds = ['178323', '223765', '27659'];
-      const sensorNames = ['Riverdale', 'Gallagher Park', 'Cloverdale'];
-      const url = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
+        async function fetchPurpleAirData() {
+            const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
+            const sensorMapping = {
+                '178323': {name: 'Riverdale', coordinates: [53.5563, -113.4642]},
+                '223765': {name: 'Gallagher Park', coordinates: [53.5398, -113.4730]},
+                '27659': {name: 'Cloverdale', coordinates: [53.5499, -113.4719]}
+            };
+            const sensorIds = Object.keys(sensorMapping);
+            const purpleAirUrl = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
 
 
             function adjustPm25(pm25, humidity) {
@@ -108,31 +113,29 @@
                     }
                 });
                 const data = await response.json();
-                data.data.forEach((sensorData, index) => {
+                data.data.forEach(sensorData => {
                     const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
                     const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
                     const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
+                    const sensorInfo = sensorMapping[sensorId];
 
+                    // Adjust the timestamp to the local timezone
+                    const adjustedTimestamp = new Date(last_seen * 1000);
 
-            // Adjust the timestamp to the local timezone
-            const adjustedTimestamp = new Date((last_seen) * 1000);
-
-            const purpleAirDataDiv = document.getElementById(`purpleAirData${index + 1}`);
-            purpleAirDataDiv.innerHTML = `
-              <p>${sensorNames[index]} at ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
-              <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
-              <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
-            `;
-          });
-
+                    const purpleAirDataDiv = document.getElementById(`purpleAirData${sensorIds.indexOf(sensorId) + 1}`);
+                    purpleAirDataDiv.innerHTML = `
+                        <p>${sensorInfo.name} at ${isNaN(adjustedTimestamp.getTime()) ? 'N/A' : adjustedTimestamp.toLocaleString()}</p>
+                        <p>PM2.5 (past 1hr): ${adjustedPm25_60minute.toFixed(1)} µg/m³</p>
+                        <p>PM2.5 (past 10min): ${adjustedPm25_10minute.toFixed(1)} µg/m³</p>
+                    `;
 
                     sendToMap('purpleair', {
                         id: sensorId,
-                        name: sensorNames[index],
+                        name: sensorInfo.name,
                         lastSeen: adjustedTimestamp.toLocaleString(),
                         pm25_60: adjustedPm25_60minute.toFixed(1),
                         pm25_10: adjustedPm25_10minute.toFixed(1),
-                        humidity: humidity
+                        coordinates: sensorInfo.coordinates
                     });
                 });
             } catch (error) {
