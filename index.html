@@ -108,7 +108,7 @@
                     }
                 });
                 const data = await response.json();
-                data.data.forEach(sensorData => {
+                data.data.forEach((sensorData, index) => {
                     const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
                     const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
                     const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
@@ -138,7 +138,6 @@
         }
 
         function sendToMap(type, data) {
-            console.log(`Sending to map: ${JSON.stringify(data)}`);
             const iframe = document.getElementById('mapFrame');
             iframe.contentWindow.postMessage({ type, data }, '*');
         }
