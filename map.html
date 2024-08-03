@@ -84,11 +84,6 @@
             if (type === 'mccauley') {
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
-                const sensorLocations = {
-                    '223765': [53.532684, -113.47296],  // Gallagher Park
-                    '178323': [53.542114, -113.464294], // Riverdale
-                    '27659': [53.535645, -113.47194]    // Cloverdale          
-                };
                 addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
             }
         });
