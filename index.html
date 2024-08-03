@@ -83,6 +83,7 @@
         // Fetch and process PurpleAir data
         async function fetchPurpleAirData() {
             const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
+            const sensorIds = ['178323', '223765', '27659'];
             const sensorMapping = {
                 '178323': {name: 'Riverdale', coordinates: [53.542114, -113.464294]},
                 '223765': {name: 'Gallagher Park', coordinates: [53.532684, -113.47296]},
@@ -110,13 +111,11 @@
                     }
                 });
                 const data = await response.json();
-                data.data.forEach((sensorData, index) => {
+                data.data.forEach((sensorData => {
                     const [sensorId, last_seen, humidity, pm2_5_60minute, pm2_5_10minute] = sensorData;
                     const adjustedPm25_60minute = adjustPm25(pm2_5_60minute, humidity);
                     const adjustedPm25_10minute = adjustPm25(pm2_5_10minute, humidity);
                     const sensorInfo = sensorMapping[sensorId];
-
-                    console.log(`Sensor ID: ${sensorId}, Sensor Name: ${sensorName}`);
 
                     const purpleAirDataDiv = document.getElementById(`purpleAirData${sensorIds.indexOf(sensorId) + 1}`);
                     purpleAirDataDiv.innerHTML = `
@@ -131,7 +130,6 @@
                         lastSeen: new Date(last_seen * 1000).toLocaleString(),
                         pm25_60: adjustedPm25_60minute.toFixed(1),
                         pm25_10: adjustedPm25_10minute.toFixed(1),
-                        humidity: humidity,
                         coordinates: sensorInfo.coordinates
                     });
                 });
