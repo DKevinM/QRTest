@@ -139,10 +139,10 @@
         }
 
         function sendToMap(type, data) {
-            console.log(`Sending to map: ${JSON.stringify(data)}`);
-            const iframe = document.getElementById('mapFrame');
-            iframe.contentWindow.postMessage({ type, data }, '*');
-        }
+        console.log(`Sending to map: ${type}`, data);  // Log the data being sent
+        const iframe = document.getElementById('mapFrame');
+        iframe.contentWindow.postMessage({ type, data }, '*');
+    }
 
         window.addEventListener('message', (event) => {
             if (event.data === 'ready') {
