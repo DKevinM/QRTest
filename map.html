@@ -86,9 +86,9 @@
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
                 const sensorLocations = {
+                    '27659': {coords: [53.535645, -113.47194], name: 'Cloverdale'},
                     '178323': {coords: [53.542114, -113.464294], name: 'Riverdale'},
-                    '223765': {coords: [53.532684, -113.47296], name: 'Gallagher Park'},
-                    '27659': {coords: [53.535645, -113.47194], name: 'Cloverdale'}
+                    '223765': {coords: [53.532684, -113.47296], name: 'Gallagher Park'}
                 };
 
                 // Loop through the sensor locations to find a match
