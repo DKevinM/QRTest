@@ -67,8 +67,8 @@
                 fillOpacity: 0.2,
                 radius: 250
             }).addTo(map)
-            .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25} µg/m³<br><b>Date:</b> ${date}`);
-
+            .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}&nbsp;µg/m³<br><b>Date:</b> ${date}`);
+ 
             const icon = L.divIcon({
                 className: 'aqhi-label purpleair-label',
                 html: `${pm25} µg/m³`,
