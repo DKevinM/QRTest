@@ -86,8 +86,8 @@
             } else if (type === 'purpleair') {
                 const sensorLocations = {
                     '178323': [53.542114, -113.464294], // Riverdale
-                    '27659': [53.535645, -113.47194]    // Cloverdale
                     '223765': [53.532684, -113.47296],  // Gallagher Park
+                    '27659': [53.535645, -113.47194]    // Cloverdale
                 };
                  if (sensorLocations[data.id]) {
                     addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
