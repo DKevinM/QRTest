@@ -81,6 +81,7 @@
         
         window.addEventListener('message', (event) => {
             const { type, data } = event.data;
+            console.log(`Received from parent: ${type}`, data);  // Log the received data
             if (type === 'mccauley') {
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
@@ -89,7 +90,7 @@
                     '223765': [53.532684, -113.47296],  // Gallagher Park
                     '27659': [53.535645, -113.47194]    // Cloverdale
                 };
-                 if (sensorLocations[data.id]) {
+                if (sensorLocations[data.id]) {
                     addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
                 } else {
                     console.error('Invalid sensor ID:', data.id);
