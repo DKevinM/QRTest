@@ -85,15 +85,23 @@
             if (type === 'mccauley') {
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
-            const sensorLocations = {
+                const sensorLocations = {
                     '178323': {coords: [53.542114, -113.464294], name: 'Riverdale'},
                     '223765': {coords: [53.532684, -113.47296], name: 'Gallagher Park'},
                     '27659': {coords: [53.535645, -113.47194], name: 'Cloverdale'}
                 };
-                const sensor = sensorLocations[data.id];
-                if (sensor && sensor.name === data.name) {
-                    addPurpleAirSensor(sensor.coords[0], sensor.coords[1], data.pm25_60, data.name, data.lastSeen);
-                } else {
+
+                // Loop through the sensor locations to find a match
+                let matched = false;
+                for (const [sensorId, sensor] of Object.entries(sensorLocations)) {
+                    if (data.id === sensorId && data.name === sensor.name) {
+                        addPurpleAirSensor(sensor.coords[0], sensor.coords[1], data.pm25_60, data.name, data.lastSeen);
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) {
                     console.error('Invalid sensor ID or name mismatch:', data.id, data.name);
                 }
             }
