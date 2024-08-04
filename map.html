@@ -24,6 +24,9 @@
         .purpleair-label {
             font-size: 12px; /* Smaller font size for PurpleAir */
         }
+        .nowrap {
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -67,11 +70,11 @@
                 fillOpacity: 0.2,
                 radius: 250
             }).addTo(map)
-            .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> ${pm25}&nbsp;µg/m³<br><b>Date:</b> ${date}`);
+            .bindPopup(`<b>Site:</b> ${name}<br><b>PM2.5 (past 1hr):</b> <span class="nowrap">${pm25}&nbsp;µg/m³</span><br><b>Date:</b> ${date}`);
  
             const icon = L.divIcon({
                 className: 'aqhi-label purpleair-label',
-                html: `${pm25}&nbsp;µg/m³`,
+                html: `<span class="nowrap">${pm25}&nbsp;µg/m³</span>`,
                 iconSize: [40, 40],
                 iconAnchor: [15, 15]
             });
