@@ -22,7 +22,7 @@
             font-weight: bold;
         }
         .purpleair-label {
-            font-size: 9px; /* Smaller font size for PurpleAir */
+            font-size: 12px; /* Smaller font size for PurpleAir */
         }
     </style>
 </head>
@@ -72,8 +72,8 @@
             const icon = L.divIcon({
                 className: 'aqhi-label purpleair-label',
                 html: `${pm25} µg/m³`,
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
             });
 
             L.marker([lat, lng], {icon: icon}).addTo(map);
@@ -86,9 +86,9 @@
                 addStationToMap(53.549509, -113.48593, data.Aqhi, "Edmonton McCauley", new Date(data.ReadingDate).toLocaleString());
             } else if (type === 'purpleair') {
                 const sensorLocations = {
-                    '178323': [53.542114, -113.464294], // Riverdale
-                    '223765': [53.532684, -113.47296],  // Gallagher Park
-                    '27659': [53.535645, -113.47194]    // Cloverdale
+                    '223765': [53.542114, -113.464294],  // Gallagher Park
+                    '178323': [53.535645, -113.47194], // Riverdale
+                    '27659': [53.532684, -113.47296]    // Cloverdale
                 };
                 if (sensorLocations[data.id]) {
                     addPurpleAirSensor(sensorLocations[data.id][0], sensorLocations[data.id][1], data.pm25_60, data.name, data.lastSeen);
