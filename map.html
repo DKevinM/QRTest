@@ -91,17 +91,11 @@
                     '223765': {coords: [53.532684, -113.47296], name: 'Gallagher Park'}
                 };
 
-                // Loop through the sensor locations to find a match
-                let matched = false;
-                for (const [sensorId, sensor] of Object.entries(sensorLocations)) {
-                    if (data.id === sensorId && data.name === sensor.name) {
-                        addPurpleAirSensor(sensor.coords[0], sensor.coords[1], data.pm25_60, data.name, data.lastSeen);
-                        matched = true;
-                        break;
-                    }
-                }
-
-                if (!matched) {
+                // Check for ID and name match			
+                const sensor = sensorLocations[data.id];
+                if (sensor && sensor.name === data.name) {
+                    addPurpleAirSensor(sensor.coords[0], sensor.coords[1], data.pm25_60, data.name, data.lastSeen);
+                } else {
                     console.error('Invalid sensor ID or name mismatch:', data.id, data.name);
                 }
             }
