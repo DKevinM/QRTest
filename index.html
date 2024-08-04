@@ -85,14 +85,10 @@
         // Fetch and process PurpleAir data
         async function fetchPurpleAirData() {
             const API_KEY = 'ED3E067C-0904-11ED-8561-42010A800005';
-            const sensorDataMap = {
-                '178323': 'Riverdale',
-                '223765': 'Gallagher Park',
-                '27659': 'Cloverdale'
-            };
+            const sensorIds = ['27659', '178323',  '223765' ];
+            const sensorNames = ['Cloverdale', 'Riverdale', 'Gallagher Park'];
             const sensorIds = Object.keys(sensorDataMap);
             const purpleAirUrl = `https://api.purpleair.com/v1/sensors?fields=last_seen,humidity,pm2.5_60minute,pm2.5_10minute&show_only=${sensorIds.join(',')}`;
-
             function adjustPm25(pm25, humidity) {
                 let adjustedPm25 = pm25;
                 if (humidity < 30) {
