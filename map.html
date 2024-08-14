@@ -63,7 +63,7 @@
 
         // Add PurpleAir sensor to the map
         function addPurpleAirSensor(lat, lng, pm25, name, date) {
-            const color = isNaN(pm25) || pm25 === null ? 'gray' : pm25 <= 30 ? 'blue' : pm25 <= 60 ? 'orange' : pm25 <= 100 ? 'red' : 'brown';
+            const color = pm25 == null || pm25 === '' || isNaN(pm25) ? 'gray' : pm25 <= 30 ? 'blue' : pm25 <= 60 ? 'orange' : pm25 <= 100 ? 'red' : 'brown';
             L.circle([lat, lng], {
                 color: color,
                 fillColor: color,
